@@ -1,65 +1,68 @@
-import React, { useState } from "react"
-import { X } from "lucide-react"
-import type { Product } from "./types"
-import { addProduct, editProduct } from "../utils/api"
+import React, { useState } from "react";
+import { X } from "lucide-react";
+import type { Product } from "./types";
+import { addProduct, editProduct } from "../utils/api";
 
 type ProductModalProps = {
-  product?: Product
-  onClose: () => void
-  onSave: (product: Product) => void
-  categories: string[]
-}
+  product?: Product;
+  onClose: () => void;
+  onSave: (product: Product) => void;
+};
 
 export default function ProductModal({
   product,
   onClose,
   onSave,
-  categories,
+ 
 }: ProductModalProps) {
-  const [formData, setFormData] = useState<Omit<Product, "_id"> & { _id?: string }>({
+  const [formData, setFormData] = useState<
+    Omit<Product, "_id"> & { _id?: string }
+  >({
     _id: product?._id,
     name: product?.name || "",
     description: product?.description || "",
     price: product?.price || 0,
     quantity: product?.quantity || 1,
-    category: product?.category || categories[0],
+    category: product?.category || "Sport",
     available: product?.available ?? true,
     image: product?.image || "/placeholder.svg?height=200&width=200",
-  })
+  });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
-    const { name, value, type } = e.target
+    const { name, value, type } = e.target;
 
     if (type === "checkbox") {
-      const target = e.target as HTMLInputElement
-      setFormData({ ...formData, [name]: target.checked })
+      const target = e.target as HTMLInputElement;
+      setFormData({ ...formData, [name]: target.checked });
     } else if (name === "price" || name === "quantity") {
-      setFormData({ ...formData, [name]: Number(value) })
+      setFormData({ ...formData, [name]: Number(value) });
     } else {
-      setFormData({ ...formData, [name]: value })
+      setFormData({ ...formData, [name]: value });
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
       if (formData._id) {
-        console.log("Editing product:", formData)
-        const updated = await editProduct(formData._id, formData)
-        onSave(updated)
+        console.log("Editing product:", formData);
+        const updated = await editProduct(formData._id, formData);
+        onSave(updated);
       } else {
-        const created = await addProduct(formData)
-        onSave(created)
+        const created = await addProduct(formData);
+        onSave(created);
       }
-      onClose()
+      onClose();
     } catch (error) {
-      console.error("Error saving product:", error)
-      alert("Something went wrong while saving the product.")
+      console.error("Error saving product:", error);
+      alert("Something went wrong while saving the product.");
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 bg-transparent flex items-center justify-center p-4 z-50">
@@ -68,19 +71,55 @@ export default function ProductModal({
           <h2 className="text-lg font-medium text-gray-900">
             {formData._id ? "Edit Product" : "Add New Product"}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-500 focus:outline-none">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-500 focus:outline-none"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
-          <InputField label="Product Name" name="name" value={formData.name} onChange={handleChange} required />
-          <TextareaField label="Description" name="description" value={formData.description} onChange={handleChange} />
-          <InputField label="Price ($)" name="price" value={formData.price} onChange={handleChange} type="number" min="1" step="1" required />
-          <InputField label="Quantity" name="quantity" value={formData.quantity} onChange={handleChange} type="number" min="0" required />
+          <InputField
+            label="Product Name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+          <TextareaField
+            label="Description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+          />
+          <InputField
+            label="Price ($)"
+            name="price"
+            value={formData.price}
+            onChange={handleChange}
+            type="number"
+            min="1"
+            step="1"
+            required
+          />
+          <InputField
+            label="Quantity"
+            name="quantity"
+            value={formData.quantity}
+            onChange={handleChange}
+            type="number"
+            min="0"
+            required
+          />
 
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700">Category</label>
+            <label
+              htmlFor="category"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Category
+            </label>
             <select
               id="category"
               name="category"
@@ -88,16 +127,30 @@ export default function ProductModal({
               onChange={handleChange}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
-              
-              <option key="Sport" value="Sport">Sport</option>
-                <option key="Electronics" value="Electronics">Electronics</option>
-                <option key="Fashion" value="Fashion">Fashion</option>
-                <option key="Food" value="Food">Food</option>
-                <option key="Beauty" value="Beauty">Beauty</option>
+              <option key="Sport" value="Sport">
+                Sport
+              </option>
+              <option key="Electronics" value="Electronics">
+                Electronics
+              </option>
+              <option key="Fashion" value="Fashion">
+                Fashion
+              </option>
+              <option key="Food" value="Food">
+                Food
+              </option>
+              <option key="Beauty" value="Beauty">
+                Beauty
+              </option>
             </select>
           </div>
 
-          <InputField label="Image URL" name="image" value={formData.image} onChange={handleChange} />
+          <InputField
+            label="Image URL"
+            name="image"
+            value={formData.image}
+            onChange={handleChange}
+          />
 
           <div className="flex items-center">
             <input
@@ -108,7 +161,10 @@ export default function ProductModal({
               onChange={handleChange}
               className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
             />
-            <label htmlFor="available" className="ml-2 block text-sm text-gray-700">
+            <label
+              htmlFor="available"
+              className="ml-2 block text-sm text-gray-700"
+            >
               In Stock
             </label>
           </div>
@@ -131,7 +187,7 @@ export default function ProductModal({
         </form>
       </div>
     </div>
-  )
+  );
 }
 
 // Reusable Input Field
@@ -141,7 +197,10 @@ function InputField({
 }: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
   return (
     <div>
-      <label htmlFor={props.name} className="block text-sm font-medium text-gray-700">
+      <label
+        htmlFor={props.name}
+        className="block text-sm font-medium text-gray-700"
+      >
         {label}
       </label>
       <input
@@ -149,7 +208,7 @@ function InputField({
         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
       />
     </div>
-  )
+  );
 }
 
 // Reusable Textarea Field
@@ -159,7 +218,10 @@ function TextareaField({
 }: React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string }) {
   return (
     <div>
-      <label htmlFor={props.name} className="block text-sm font-medium text-gray-700">
+      <label
+        htmlFor={props.name}
+        className="block text-sm font-medium text-gray-700"
+      >
         {label}
       </label>
       <textarea
@@ -168,5 +230,5 @@ function TextareaField({
         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
       />
     </div>
-  )
+  );
 }

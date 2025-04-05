@@ -6,12 +6,6 @@ import ProductModal from "./component/ProductModal";
 import type { Product } from "./component/types";
 import { getAllProduct } from "./utils/api";
 
-// Helper: Extract unique categories
-const getCategories = (products: Product[] = []) => {
-  if (!Array.isArray(products)) return [];
-  return Array.from(new Set(products.map((p) => p.category)));
-};
-
 // Type for full product state returned by API
 type ProductListState = {
   products: Product[];
@@ -31,7 +25,8 @@ export default function App() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [selectedProductDetails, setSelectedProductDetails] = useState<Product | null>(null);
+  const [selectedProductDetails, setSelectedProductDetails] =
+    useState<Product | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [itemsPerPage, setItemsPerPage] = useState<number>(6);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 6000]);
@@ -39,14 +34,11 @@ export default function App() {
   const [showAvailableOnly, setShowAvailableOnly] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const categories = getCategories(products.products);
-
   // Reset page to 1 on filter change
   useEffect(() => {
     setCurrentPage(1);
   }, [priceRange, selectedCategories, showAvailableOnly]);
 
-  // Debounced API call for filters and pagination
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       const fetchProducts = async () => {
@@ -68,12 +60,18 @@ export default function App() {
       };
 
       fetchProducts();
-    }, 300); // Debounce delay
+    }, 300);
 
     return () => clearTimeout(delayDebounce);
-  }, [currentPage, itemsPerPage, priceRange, selectedCategories, showAvailableOnly]);
+  }, [
+    currentPage,
+    itemsPerPage,
+    priceRange,
+    selectedCategories,
+    showAvailableOnly,
+  ]);
 
-  const handleAddProduct = async() => {
+  const handleAddProduct = async () => {
     const result = await getAllProduct({
       page: currentPage,
       limit: itemsPerPage,
@@ -88,7 +86,7 @@ export default function App() {
     setShowAddModal(false);
   };
 
-  const handleEditProduct = async() => {
+  const handleEditProduct = async () => {
     const result = await getAllProduct({
       page: currentPage,
       limit: itemsPerPage,
@@ -124,11 +122,12 @@ export default function App() {
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
-      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
+      prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category]
     );
   };
-   
-  
+
   const handleEditProductButton = (product: Product) => {
     setSelectedProduct(product);
     setShowEditModal(true);
@@ -152,7 +151,6 @@ export default function App() {
             onClose={() => setShowFilters(false)}
             priceRange={priceRange}
             onPriceChange={setPriceRange}
-            categories={categories}
             selectedCategories={selectedCategories}
             onCategoryToggle={toggleCategory}
             showAvailableOnly={showAvailableOnly}
@@ -162,19 +160,20 @@ export default function App() {
           <div className="flex-1 flex flex-col">
             <div className="flex justify-between items-center mb-4">
               <div className="text-sm text-gray-500">
-                {products.totalProducts} product{products.products.length !== 1 && "s"} found
+                {products.totalProducts} product
+                {products.products.length !== 1 && "s"} found
               </div>
             </div>
 
             <ProductGrid
-  products={products}
-  currentPage={currentPage}
-  onPageChange={setCurrentPage}
-  onToggleDetails={toggleProductDetails}
-  onEditProduct={handleEditProductButton}
-  onDeleteProduct={onDeleteProduct}
-  itemsPerPage={itemsPerPage}
-/>
+              products={products}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              onToggleDetails={toggleProductDetails}
+              onEditProduct={handleEditProductButton}
+              onDeleteProduct={onDeleteProduct}
+              itemsPerPage={itemsPerPage}
+            />
           </div>
         </div>
       </div>
@@ -183,7 +182,7 @@ export default function App() {
         <ProductModal
           onClose={() => setShowAddModal(false)}
           onSave={handleAddProduct}
-          categories={categories}
+         
         />
       )}
 
@@ -195,7 +194,7 @@ export default function App() {
             setSelectedProduct(null);
           }}
           onSave={handleEditProduct}
-          categories={categories}
+       
         />
       )}
 
@@ -204,7 +203,7 @@ export default function App() {
           product={selectedProductDetails}
           onClose={() => setSelectedProductDetails(null)}
           onSave={() => {}}
-          categories={categories}
+         
           readOnly
           onEdit={() => handleEditProductButton(selectedProductDetails)}
           onDelete={() => handleDeleteProduct(selectedProductDetails.id)}

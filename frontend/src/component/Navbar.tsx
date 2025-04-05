@@ -1,9 +1,9 @@
-import { Plus } from "lucide-react"
+import { Plus } from "lucide-react";
 
 type NavbarProps = {
-  onAddProduct: () => void
-  onToggleFilters: () => void
-}
+  onAddProduct: () => void;
+  onToggleFilters: () => void;
+};
 
 export default function Navbar({ onAddProduct, onToggleFilters }: NavbarProps) {
   return (
@@ -44,5 +44,5 @@ export default function Navbar({ onAddProduct, onToggleFilters }: NavbarProps) {
         </div>
       </div>
     </nav>
-  )
+  );
 }
